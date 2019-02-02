@@ -39,9 +39,32 @@ OTHER ideas:
 -SVM fitter
 """
 
+# splits the data intro a train dataframe and validate dataframe randomly
+def split_train_validate(df, frac):
+    df_train = df.sample(frac=frac)
+    df_validate = df.loc[~df.index.isin(df_train.index)]
+    return df_train, df_validate
+
+# replaces the missing vals in the dataframe with the median
+# also creates a new column with T/F values on whether that value is null, so RF can use it!
+def replace_missing_vals(df, col, name, na_dict):
+    # checks if there are nulls in the column or if the
+    if pd.isnull(col).sum() or (name in na_dict):
+        # creates a column with T/F values per row on whether that row is null
+        df[name + '_na'] = pd.isnull(col)
+        # na_dict keeps track of the medians found for columns
+        if name in na_dict:
+            filler = na_dict[name]
+        else:
+            filler = col.median()
+        # here is where the replacement happens
+        df[name] = col.fillna(filler)
+        na_dict[name] = filler
+    return na_dict
+
 # splits the dataframe into a dataframe with just params and the target y as its own dataframe
 # also drops any columns not needed (put as list in skips)
-def split_df_y(df, y_col_name, skips=None):
+def split_df_y(df, y_col_name, skips=None, na_dict=None):
     df = df.copy()
     y = df[y_col_name].values
     if skips is None:
@@ -49,13 +72,13 @@ def split_df_y(df, y_col_name, skips=None):
     else:
         skips.append(y_col_name)
     df.drop(skips, axis=1, inplace=True)
-    return df, y
-
-# splits the data intro a train dataframe and validate dataframe randomly
-def split_train_validate(df, frac):
-    df_train = df.sample(frac=frac)
-    df_validate = df.loc[~df.index.isin(df_train.index)]
-    return df_train, df_validate
+    if na_dict is None:
+        na_dict = {}
+    # not sure what name, column are but it's what he uses lol
+    # not sure what df.items() returns either
+    for name, column in df.items():
+        na_dict = replace_missing_vals(df, column, name, na_dict)
+    return df, y, na_dict
 
 # the imports we need to run Random Forest
 from sklearn.ensemble import RandomForestRegressor
@@ -69,8 +92,24 @@ train_data, validate_data = split_train_validate(machine_data, 0.8)
 # the skip_fields is other columns we want to drop
 target_y_name = "YIELD"
 skip_fields = ["PROCESS_ID", "DATE", "YIELD_TOTAL", "YIELD_AVERAGE"]
-train_data_params, train_yield = split_df_y(train_data, target_y_name, skips=skip_fields)
-validate_data_params, validate_yield = split_df_y(validate_data, target_y_name, skips=skip_fields)
+# na_dict keeps track of the columns which had nulls and their medians
+# need to use this in validate_data to make sure medians used across both dataframes
+train_data_params, train_yield, na_dict = split_df_y(train_data, target_y_name, skips=skip_fields)
+
+# the extra na_dict param makes sure na_dict medians from train used in validate!
+validate_data_params, validate_yield, _ = split_df_y(validate_data, target_y_name, skips=skip_fields, na_dict=na_dict)
+
+print("This is the train parameter-only data")
+print(train_data_params.head())
+
+print("This is the train output-only data")
+print(train_yield.head())
+
+print("This is the validate parameter-only data")
+print(validate_data_params.head())
+
+print("This is the validate output-only data")
+print(validate_yield.head())
 
 # the model is fit on the train data
 rf.fit(train_data_params, train_yield)
