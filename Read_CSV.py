@@ -88,3 +88,12 @@ rf.score(validate_data_params, validate_yield)
 # to see how estimators do at a tree level, search
 # preds = np.stack([t.predict(X_valid) for t in rf.estimators_])
 # on the RF doc and work from there. X_valid will have to be replaced with actual validation data variable name
+
+# this makes a table to see how important various features of rf are!!
+def rf_feature_importance(rf, df):
+    return pd.DataFrame({'cols':df.columns, 'imp':rf.feature_importances_}).sort_values('imp', ascending=False)
+
+features = rf_feature_importance(rf, train_data_params)
+# to see the 20 most important features
+print(features[:20])
+
