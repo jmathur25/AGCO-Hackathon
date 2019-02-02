@@ -72,5 +72,13 @@ validate_data_params, validate_yield = split_df_y(validate_data, target_y_name, 
 # the model is fit on the train data
 rf.fit(train_data_params, train_yield)
 # the model is evaluated using its weights on the validate)
+print("Model score using defaults")
+rf.score(validate_data_params, validate_yield)
+
+
+# to use some more features of Random Forest
+rf = RandomForestRegressor(n_estimators=40, min_samples_leaf=3, max_features=0.5, n_jobs=-1)
+rf.fit(train_data_params, train_yield)
+print("Model score using custom input parameters")
 rf.score(validate_data_params, validate_yield)
 
