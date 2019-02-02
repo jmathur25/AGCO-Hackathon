@@ -91,9 +91,12 @@ rf.score(validate_data_params, validate_yield)
 
 # this makes a table to see how important various features of rf are!!
 def rf_feature_importance(rf, df):
-    return pd.DataFrame({'cols':df.columns, 'imp':rf.feature_importances_}).sort_values('imp', ascending=False)
+    return pd.DataFrame({'cols':df.columns, 'importance':rf.feature_importances_}).sort_values('importance', ascending=False)
 
 features = rf_feature_importance(rf, train_data_params)
-# to see the 20 most important features
-print(features[:20])
+# to see the 10 most important features
+print(features[:10])
 
+def plot_features(features):
+    return features.plot('cols', 'importance', 'barh', figsize=(12,7), legend=False)
+plot_features(features)
