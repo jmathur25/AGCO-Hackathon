@@ -1,7 +1,5 @@
-import csv
+import pandas as pd
 
 filename = "CAN_Test_DATA.csv"
 
-with open(filename) as f:
-    csv_reader = csv.reader(f)
-    combine_data = list(csv_reader)
+machine_data = pd.read_csv(filename)
