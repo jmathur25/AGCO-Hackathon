@@ -1,5 +1,12 @@
 import pandas as pd
+import csv
 
 filename = "CAN_Test_DATA.csv"
 
-machine_data = pd.read_csv(filename)
+with open(filename) as f:
+	csv_reader = csv.reader(f)
+	machine_data = list(csv_reader)
+
+machine_data = pd.DataFrame(machine_data)
+
+print(machine_data.columns.tolist())
