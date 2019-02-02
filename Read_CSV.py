@@ -33,5 +33,30 @@ NEED TO
 -handle nulls/empty vals for processes
 -fit params to yield
 -split data into testing and validation
--figure out most important params
+-figure out most important params from RF fit
+
+OTHER ideas:
+-SVM fitter
 """
+
+def split_df_y(df, y_col_name, skips=None):
+    df = df.copy()
+    y = df[y_col_name].values
+    if skips is None:
+        skips = y_col_name
+    else:
+        skips.append(y_col_name)
+    df.drop(skips, axis=1, inplace=True)
+    return df, y
+
+
+
+from sklearn.ensemble import RandomForestRegressor
+rf = RandomForestRegressor(n_jobs = -1)
+
+target_y_name = "YIELD"
+skip_fields = ["PROCESS_ID", "DATE", "YIELD_TOTAL", "YIELD_AVERAGE"]
+machine_data_params, yield_data = split_df_y(machine_data, target_y_name, skips=skip_fields)
+rf.fit(machine_data_params, yield_data)
+rf.score(machine_data, yield_data)
+
