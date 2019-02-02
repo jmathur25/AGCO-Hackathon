@@ -39,6 +39,8 @@ OTHER ideas:
 -SVM fitter
 """
 
+# splits the dataframe into a dataframe with just params and the target y as its own dataframe
+# also drops any columns not needed (put as list in skips)
 def split_df_y(df, y_col_name, skips=None):
     df = df.copy()
     y = df[y_col_name].values
@@ -49,12 +51,13 @@ def split_df_y(df, y_col_name, skips=None):
     df.drop(skips, axis=1, inplace=True)
     return df, y
 
-
+# splits the data intro a train dataframe and validate dataframe randomly
 def split_train_validate(df, frac):
     df_train = df.sample(frac=frac)
     df_validate = df.loc[~df.index.isin(df_train.index)]
     return df_train, df_validate
 
+# the imports we need to run Random Forest
 from sklearn.ensemble import RandomForestRegressor
 rf = RandomForestRegressor(n_jobs = -1)
 
@@ -82,3 +85,6 @@ rf.fit(train_data_params, train_yield)
 print("Model score using custom input parameters")
 rf.score(validate_data_params, validate_yield)
 
+# to see how estimators do at a tree level, search
+# preds = np.stack([t.predict(X_valid) for t in rf.estimators_])
+# on the RF doc and work from there. X_valid will have to be replaced with actual validation data variable name
