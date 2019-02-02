@@ -25,3 +25,13 @@ for i in range(len(machine_data["timestamp"])):
 
 machine_data['process_id'] = np.array(process_id_array)
 print(set(machine_data['process_id']))
+
+"""
+RANDOM FOREST IMPLEMENTATION
+-assumes dataframe has each process id as a row and parameters as a column
+NEED TO
+-handle nulls/empty vals for processes
+-fit params to yield
+-split data into testing and validation
+-figure out most important params
+"""
