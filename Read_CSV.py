@@ -50,13 +50,27 @@ def split_df_y(df, y_col_name, skips=None):
     return df, y
 
 
+def split_train_validate(df, frac):
+    df_train = df.sample(frac=frac)
+    df_validate = df.loc[~df.index.isin(df_train.index)]
+    return df_train, df_validate
 
 from sklearn.ensemble import RandomForestRegressor
 rf = RandomForestRegressor(n_jobs = -1)
 
+# splitting via the 80/20 rule
+train_data, validate_data = split_train_validate(machine_data, 0.8)
+
+# creates the split dataframes for the train and validate datasets
+# the target_y_name is the name of the column we want to predict
+# the skip_fields is other columns we want to drop
 target_y_name = "YIELD"
 skip_fields = ["PROCESS_ID", "DATE", "YIELD_TOTAL", "YIELD_AVERAGE"]
-machine_data_params, yield_data = split_df_y(machine_data, target_y_name, skips=skip_fields)
-rf.fit(machine_data_params, yield_data)
-rf.score(machine_data, yield_data)
+train_data_params, train_yield = split_df_y(train_data, target_y_name, skips=skip_fields)
+validate_data_params, validate_yield = split_df_y(validate_data, target_y_name, skips=skip_fields)
+
+# the model is fit on the train data
+rf.fit(train_data_params, train_yield)
+# the model is evaluated using its weights on the validate)
+rf.score(validate_data_params, validate_yield)
 
