@@ -8,7 +8,8 @@ def run_all():
 
     filename = "CAN_Test_DATA.csv"
 
-    machine_data = pd.read_csv(filename, encoding='mac_roman', nrows=10000)
+    # , nrows=10000
+    machine_data = pd.read_csv(filename, encoding='mac_roman')
 
     machine_data = machine_data.drop(columns='Unnamed: 0')
     # print(machine_data.head())
@@ -56,13 +57,12 @@ def run_all():
         # maximum number of processes that we can get from current process id (maximum number of rows for one param)
         num_processes = int((max([len(param_name_to_param_value_map[key]) for key in param_name_to_param_value_map.keys()]) - min([len(param_name_to_param_value_map[key]) for key in param_name_to_param_value_map.keys()]))/2)
 
-        generate_processes(num_processes, param_name_to_param_value_map, reordered, reordered_row_count, PARAMETER_LIST, i, current_date)
+        generate_processes(num_processes, param_name_to_param_value_map, reordered, reordered_row_count, PARAMETER_LIST, i, current_date, throwout_row='YIELD')
 
     by_parameter = pd.DataFrame(reordered).transpose()
 
     # print(by_parameter)
     return by_parameter
 
-
-
-
+print(run_all())
+print(run_all()['YIELD'])
