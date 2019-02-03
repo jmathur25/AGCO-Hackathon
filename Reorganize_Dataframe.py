@@ -36,7 +36,7 @@ def day_to_dataframe(params_seen, rows, break_row):
 
 
 def make_process_events(day_to_rows_map):
-	whole_dataset = pd.DataFrame()
+	dataset_list = []
 	# list_of_common_params = set()
 	first = True
 	for key in day_to_rows_map.keys():
@@ -46,9 +46,22 @@ def make_process_events(day_to_rows_map):
 		day_dataframe = day_to_dataframe(params_seen, day_to_rows_map[key], break_row)
 		if first:
 			list_of_common_params = set(day_dataframe.columns.values)
+			first = False
 		else:
 			list_of_common_params = list_of_common_params.intersection(set(day_dataframe.columns.values))
-		print(day_dataframe)
-		whole_dataset.append(day_dataframe, ignore_index=True)
-	print(list_of_common_params)
+		dataset_list.append(day_dataframe)
+	whole_dataset = pd.DataFrame()
+	first = True
+	for df in dataset_list:
+		not_in_common = set()
+		for column_name in df.columns.values:
+			if column_name not in list_of_common_params:
+				not_in_common.add(column_name)
+		df.drop(list(not_in_common), axis=1, inplace=True)
+		if first:
+			whole_dataset = df
+			first = False
+		else:
+			whole_dataset.append(df, sort=True, ignore_index=True)
+
 	return whole_dataset
