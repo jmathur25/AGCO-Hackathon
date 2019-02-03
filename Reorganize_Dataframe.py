@@ -1,12 +1,12 @@
 import pandas as pd
 import numpy as np
 
-def generate_process_id_to_rows_dict(machine_data):
+def generate_day_to_rows_dict(machine_data):
 	process_id_to_rows_dict = {}
 	machine_data_aslist = machine_data.values.tolist()
 
-	for i in range(len(machine_data["process_id"])):
-		current_id = machine_data["process_id"][i]
+	for i in range(len(machine_data["day"])):
+		current_id = machine_data["day"][i]
 		if current_id in process_id_to_rows_dict.keys():
 			process_id_to_rows_dict[current_id].append(machine_data_aslist[i])
 		else:
@@ -14,52 +14,41 @@ def generate_process_id_to_rows_dict(machine_data):
 
 	return process_id_to_rows_dict
 
-def generate_param_name_to_param_value_map(row_list):
-	param_name_to_param_value_map = {}
+def find_first_valid_value_of_day(rows, num_parameters=63):
+	params_seen = {}
+	break_row = 0
+	for i in range(len(rows)):
+		if len(params_seen.keys()) == num_parameters:
+			break_row = i
+			break
+		params_seen[rows[i][4]] = rows[i][6]
+	return params_seen, break_row
 
-	# loops through items in all the rows for current process id
-	for row in row_list:
-		# gets the parameter corresponding to this row
-		param_name = row[4]
-		if param_name in param_name_to_param_value_map.keys():
-			#adds param value to list
-			param_name_to_param_value_map[param_name].append(row[6])
-		else:
-			param_name_to_param_value_map[param_name] = [row[6]]
-
-	return param_name_to_param_value_map
+def day_to_dataframe(params_seen, rows, break_row):
+	events = pd.DataFrame()
+	for param in params_seen:
+		events[param] = params_seen[param]
+	for i in range(break_row+1, len(rows)):
+		params_seen[rows[i][4]] = rows[i][6]
+		events = events.append(params_seen, ignore_index=True)
+	return events
 
 
-def generate_processes(num_processes, param_name_to_param_value_map, reordered, reordered_row_count, param_list, process_id, date, throwout_row=None):
-	# loops through all the processes we can create for this process id
-	# each iteration for the loop will create a new row in reordered that is populated with the first free params it can find
-	# each process will probably get more sparse with each iteration as the number of available rows for each param decreases
-	for j in range(num_processes):
-		skip_process = False
-		current_process = {}
-		current_process['PROCESS_ID'] = process_id
-		current_process['DATE'] = date
-		# goes through each parameter in hardcoded list of parameters
-		for param in param_list:
-			try:
-				# pops a row off of the list of rows for current param, gets the can_value for that row (corresponds to 6th index)
-				current_process[param] = param_name_to_param_value_map[param].pop()
-				if param == throwout_row:
-					if current_process[param] < 0.001:
-						skip_process = True
-						break
-			except:
-				if throwout_row:
-					if param == throwout_row:
-						skip_process = True
-				# will go here if param_name_to_param_value_map[param] does not have any members left 
-				if throwout_row:
-					if param == throwout_row:
-						skip_process = True
-						break
-				current_process[param] = None
-		if skip_process:
+
+def make_process_events(day_to_rows_map):
+	whole_dataset = pd.DataFrame()
+	# list_of_common_params = set()
+	first = True
+	for key in day_to_rows_map.keys():
+		if len(day_to_rows_map[key]) < 500:
 			continue
-		# adds new process onto reordered with unique row count
-		reordered[reordered_row_count] = current_process
-		reordered_row_count += 1
+		params_seen, break_row = find_first_valid_value_of_day(day_to_rows_map[key])
+		day_dataframe = day_to_dataframe(params_seen, day_to_rows_map[key], break_row)
+		if first:
+			list_of_common_params = set(day_dataframe.columns.values)
+		else:
+			list_of_common_params = list_of_common_params.intersection(set(day_dataframe.columns.values))
+		print(day_dataframe)
+		whole_dataset.append(day_dataframe, ignore_index=True)
+	print(list_of_common_params)
+	return whole_dataset
