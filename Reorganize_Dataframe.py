@@ -49,6 +49,10 @@ def generate_processes(num_processes, param_name_to_param_value_map, reordered, 
 					if param == throwout_row:
 						skip_process = True
 				# will go here if param_name_to_param_value_map[param] does not have any members left 
+				if throwout_row:
+					if param == throwout_row:
+						skip_process = True
+						break
 				current_process[param] = None
 		if skip_process:
 			continue
