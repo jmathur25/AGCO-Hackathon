@@ -91,7 +91,7 @@ def fit_dfs(df1, df2):
 
     return return_df_1, return_df_2
 
-rf = RandomForestRegressor(n_jobs=-1, bootstrap=True, n_estimators=40, min_samples_leaf=3, max_features=0.5)
+rf = RandomForestRegressor(n_jobs=-1, bootstrap=True, n_estimators=40, min_samples_leaf=5, max_features=0.5)
 
 # runs everything in Read_CSV
 machine_data = run_all()
@@ -126,16 +126,16 @@ train_data_params, validate_data_params = fit_dfs(train_data_params, validate_da
 # print(validate_yield.head())
 
 # use this when the output you're trying to predict is too small
-# multipler = 7 for FUEL_RATE
+# multiplier = 7 for FUEL_RATE
 def increase_output_magnitude(y, multipler):
     y = (10**multipler) * y.values
     return y
 
 
-rf.fit(train_data_params, increase_output_magnitude(train_yield, 7))
+rf.fit(train_data_params, train_yield)
 # the model is evaluated using its weights on the validate)
 print("Model score")
-print(rf.score(validate_data_params, increase_output_magnitude(validate_yield, 7)))
+print(rf.score(validate_data_params, validate_yield))
 
 # to see how estimators do at a tree level, search
 # preds = np.stack([t.predict(X_valid) for t in rf.estimators_])
@@ -154,8 +154,12 @@ print(features[:30])
 # plot_features(features)
 
 # add this to make sure importance meets some threshold
-# THRESHOLD = 0.005
-# to_keep = features[features.importance>THRESHOLD].cols
-# len(to_keep)
-# fixes params to just be the ones you want
-# df_keep = machine_data[to_keep].copy()
+THRESHOLD = 0.005
+filtered_cols = features[features.importance>THRESHOLD].cols
+train_data_params = machine_data[filtered_cols].copy()
+print(train_data_params)
+print(train_yield)
+# rerunning analysis
+rf.fit(train_data_params, train_yield)
+print("New R^2")
+print(rf.score(validate_data_params, validate_yield))
