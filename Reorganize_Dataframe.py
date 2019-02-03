@@ -30,11 +30,12 @@ def generate_param_name_to_param_value_map(row_list):
 	return param_name_to_param_value_map
 
 
-def generate_processes(num_processes, param_name_to_param_value_map, reordered, reordered_row_count, param_list, process_id, date):
+def generate_processes(num_processes, param_name_to_param_value_map, reordered, reordered_row_count, param_list, process_id, date, throwout_row=None):
 	# loops through all the processes we can create for this process id
 	# each iteration for the loop will create a new row in reordered that is populated with the first free params it can find
 	# each process will probably get more sparse with each iteration as the number of available rows for each param decreases
 	for j in range(num_processes):
+		skip_process = False
 		current_process = {}
 		current_process['PROCESS_ID'] = process_id
 		current_process['DATE'] = date
@@ -44,8 +45,13 @@ def generate_processes(num_processes, param_name_to_param_value_map, reordered, 
 				# pops a row off of the list of rows for current param, gets the can_value for that row (corresponds to 6th index)
 				current_process[param] = param_name_to_param_value_map[param].pop()
 			except:
+				if throwout_row:
+					if param == throwout_row:
+						skip_process = True
 				# will go here if param_name_to_param_value_map[param] does not have any members left 
 				current_process[param] = None
+		if skip_process:
+			continue
 		# adds new process onto reordered with unique row count
 		reordered[reordered_row_count] = current_process
 		reordered_row_count += 1
