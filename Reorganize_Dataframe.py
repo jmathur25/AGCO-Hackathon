@@ -50,8 +50,11 @@ def make_process_events(day_to_rows_map):
 		else:
 			list_of_common_params = list_of_common_params.intersection(set(day_dataframe.columns.values))
 		dataset_list.append(day_dataframe)
+		print("making dataframe")
+
 	whole_dataset = pd.DataFrame()
 	first = True
+	print(list_of_common_params)
 	for df in dataset_list:
 		not_in_common = set()
 		for column_name in df.columns.values:

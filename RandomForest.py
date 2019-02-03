@@ -94,37 +94,36 @@ train_data, validate_data = split_train_validate(machine_data, 0.8)
 # creates the split dataframes for the train and validate datasets
 # the target_y_name is the name of the column we want to predict
 # the skip_fields is other columns we want to drop
-target_y_name = "YIELD"
-skip_fields = ["PROCESS_ID", "DATE", "YIELD_TOTAL", "YIELD_AVERAGE"]
+target_y_name = "FUEL_RATE"
+skip_fields = None
 # na_dict keeps track of the columns which had nulls and their medians
 # need to use this in validate_data to make sure medians used across both dataframes
 train_data_params, train_yield, na_dict = split_df_y(train_data, target_y_name, skips=skip_fields)
-# print(len(train_data_params.columns.values))
 
 # the extra na_dict param makes sure na_dict medians from train used in validate!
 validate_data_params, validate_yield, _ = split_df_y(validate_data, target_y_name, skips=skip_fields, na_dict=na_dict)
-# print(len(validate_data_params.columns.values))
 
 # fits the columns of the dfs to each other so they should share exactly the same columns
 train_data_params, validate_data_params = fit_dfs(train_data_params, validate_data_params)
 
-# print("This is the train parameter-only data")
-# print(train_data_params)
-#
-# print("This is the train output-only data")
-# print(train_yield.head())
-#
-# print("This is the validate parameter-only data")
-# print(validate_data_params)
-#
-# print("This is the validate output-only data")
-# print(validate_yield.head())
+print("This is the train parameter-only data")
+print(train_data_params)
+
+print("This is the train output-only data")
+print(train_yield.head())
+
+print("This is the validate parameter-only data")
+print(validate_data_params)
+
+print("This is the validate output-only data")
+print(validate_yield.head())
 
 # the model is fit on the train data
 rf.fit(train_data_params, train_yield)
 # the model is evaluated using its weights on the validate)
 print("Model score using defaults")
 print(rf.score(validate_data_params, validate_yield))
+print(rf.predict(validate_data_params), validate_yield)
 
 
 # to use some more features of Random Forest

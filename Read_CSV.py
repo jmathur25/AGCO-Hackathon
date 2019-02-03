@@ -10,7 +10,6 @@ def run_all():
     machine_data = pd.read_csv(filename, encoding='mac_roman', nrows=10000)
 
     machine_data = machine_data.drop(columns='Unnamed: 0')
-    # print(machine_data.head())
 
     PARAMETER_LIST = set(machine_data['can_name'])
 
@@ -34,12 +33,8 @@ def run_all():
 
 
     machine_data['day'] = np.array(day_array)
-    # print(set(machine_data['day']))
-    # print(day_to_num_processes)
-    # print(machine_data)
 
     day_to_rows_map = generate_day_to_rows_dict(machine_data)
-    # print(day_to_rows_map[0])
     return make_process_events(day_to_rows_map)
 
     
