@@ -1,3 +1,7 @@
 .idea/*
 CAN_Test_DATA.csv
 test.py
+.ipynb_checkpooints
+*.ipynb
+train_data.csv
+results.xlsx

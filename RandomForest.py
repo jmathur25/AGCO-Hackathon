@@ -116,8 +116,8 @@ train_data_params, validate_data_params = fit_dfs(train_data_params, validate_da
 # print("This is the train parameter-only data")
 # print(train_data_params)
 #
-# print("This is the train output-only data")
-# print(train_yield.head())
+print("This is the train output-only data")
+print(train_yield)
 #
 # print("This is the validate parameter-only data")
 # print(validate_data_params)
