@@ -36,7 +36,6 @@ def generate_processes(num_processes, param_name_to_param_value_map, reordered, 
 	# each process will probably get more sparse with each iteration as the number of available rows for each param decreases
 	for j in range(num_processes):
 		skip_process = False
-
 		current_process = {}
 		current_process['PROCESS_ID'] = process_id
 		current_process['DATE'] = date
@@ -50,6 +49,9 @@ def generate_processes(num_processes, param_name_to_param_value_map, reordered, 
 						skip_process = True
 						break
 			except:
+				if throwout_row:
+					if param == throwout_row:
+						skip_process = True
 				# will go here if param_name_to_param_value_map[param] does not have any members left 
 				if throwout_row:
 					if param == throwout_row:

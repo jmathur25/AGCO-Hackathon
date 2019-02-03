@@ -84,7 +84,7 @@ def fit_dfs(df1, df2):
 
     return return_df_1, return_df_2
 
-rf = RandomForestRegressor(n_jobs = -1)
+rf = RandomForestRegressor(n_jobs=-1)
 
 # runs everything in Read_CSV
 machine_data = run_all()
@@ -99,23 +99,23 @@ skip_fields = ["PROCESS_ID", "DATE", "YIELD_TOTAL", "YIELD_AVERAGE"]
 # na_dict keeps track of the columns which had nulls and their medians
 # need to use this in validate_data to make sure medians used across both dataframes
 train_data_params, train_yield, na_dict = split_df_y(train_data, target_y_name, skips=skip_fields)
-print(len(train_data_params.columns.values))
+# print(len(train_data_params.columns.values))
 
 # the extra na_dict param makes sure na_dict medians from train used in validate!
 validate_data_params, validate_yield, _ = split_df_y(validate_data, target_y_name, skips=skip_fields, na_dict=na_dict)
-print(len(validate_data_params.columns.values))
+# print(len(validate_data_params.columns.values))
 
 # fits the columns of the dfs to each other so they should share exactly the same columns
 train_data_params, validate_data_params = fit_dfs(train_data_params, validate_data_params)
 
-print("This is the train parameter-only data")
-print(train_data_params)
+# print("This is the train parameter-only data")
+# print(train_data_params)
 #
-print("This is the train output-only data")
-print(train_yield.head())
+# print("This is the train output-only data")
+# print(train_yield.head())
 #
-print("This is the validate parameter-only data")
-print(validate_data_params)
+# print("This is the validate parameter-only data")
+# print(validate_data_params)
 #
 # print("This is the validate output-only data")
 # print(validate_yield.head())
@@ -131,7 +131,7 @@ print(rf.score(validate_data_params, validate_yield))
 # rf = RandomForestRegressor(n_estimators=40, min_samples_leaf=3, max_features=0.5, n_jobs=-1)
 # rf.fit(train_data_params, train_yield)
 # print("Model score using custom input parameters")
-# rf.score(validate_data_params, validate_yield)
+# print(rf.score(validate_data_params, validate_yield))
 
 # to see how estimators do at a tree level, search
 # preds = np.stack([t.predict(X_valid) for t in rf.estimators_])
