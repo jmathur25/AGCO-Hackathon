@@ -1,5 +1,6 @@
 from sklearn.ensemble import RandomForestRegressor
 import pandas as pd
+import numpy as np
 from Read_CSV import run_all
 
 """
@@ -123,8 +124,8 @@ rf.fit(train_data_params, train_yield)
 # the model is evaluated using its weights on the validate)
 print("Model score using defaults")
 print(rf.score(validate_data_params, validate_yield))
-print(rf.predict(validate_data_params), validate_yield)
-
+# print(np.stack(rf.predict(validate_data_params), validate_yield.values))
+ 
 
 # to use some more features of Random Forest
 # rf = RandomForestRegressor(n_estimators=40, min_samples_leaf=3, max_features=0.5, n_jobs=-1)
