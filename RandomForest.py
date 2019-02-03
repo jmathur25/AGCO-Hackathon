@@ -1,6 +1,7 @@
 from sklearn.ensemble import RandomForestRegressor
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from Read_CSV import run_all
 
 """
@@ -150,7 +151,7 @@ features = rf_feature_importance(rf, train_data_params)
 print(features[:30])
 #
 def plot_features(features):
-    return features.plot('cols', 'importance', 'barh', figsize=(12,7), legend=False)
+    features.plot('cols', 'importance', 'barh', figsize=(12,7), legend=False)
 plot_features(features)
 
 # add this to make sure importance meets some threshold
