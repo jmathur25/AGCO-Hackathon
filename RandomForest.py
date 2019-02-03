@@ -101,8 +101,8 @@ train_data, validate_data = split_train_validate(machine_data, 0.8)
 # creates the split dataframes for the train and validate datasets
 # the target_y_name is the name of the column we want to predict
 # the skip_fields is other columns we want to drop
-target_y_name = "GRAIN_LOSS_Rotor"
-skip_fields = ["YIELD", "YIELD_AVERAGE", "GRAIN_LOSS_Shoe"]
+target_y_name = "YIELD"
+skip_fields = ["YIELD_AVERAGE", "YIELD_TOTAL"]
 # na_dict keeps track of the columns which had nulls and their medians
 # need to use this in validate_data to make sure medians used across both dataframes
 train_data_params, train_yield, na_dict = process_df(train_data, target_y_name, skips=skip_fields)
@@ -125,18 +125,17 @@ train_data_params, validate_data_params = fit_dfs(train_data_params, validate_da
 # # print("This is the validate output-only data")
 # print(validate_yield.head())
 
-# the model is fit on the train data
-# log_y = np.log(train_yield.values)
-# for i in range(len(log_y)):
-#     if log_y[i] == np.inf:
-#         print('here')
+# use this when the output you're trying to predict is too small
+# multipler = 7 for FUEL_RATE
+def increase_output_magnitude(y, multipler):
+    y = (10**multipler) * y.values
+    return y
 
-rf.fit(train_data_params, train_yield.values)
+
+rf.fit(train_data_params, increase_output_magnitude(train_yield, 7))
 # the model is evaluated using its weights on the validate)
 print("Model score")
-print(rf.score(validate_data_params, validate_yield.values))
-# print(rf.predict(validate_data_params))
-# print(validate_yield.values)
+print(rf.score(validate_data_params, increase_output_magnitude(validate_yield, 7)))
 
 # to see how estimators do at a tree level, search
 # preds = np.stack([t.predict(X_valid) for t in rf.estimators_])
@@ -150,9 +149,9 @@ features = rf_feature_importance(rf, train_data_params)
 # to see the 10 most important features
 print(features[:30])
 #
-def plot_features(features):
-    features.plot('cols', 'importance', 'barh', figsize=(12,7), legend=False)
-plot_features(features)
+# def plot_features(features):
+#     features.plot('cols', 'importance', 'barh', figsize=(12,7), legend=False)
+# plot_features(features)
 
 # add this to make sure importance meets some threshold
 # THRESHOLD = 0.005
