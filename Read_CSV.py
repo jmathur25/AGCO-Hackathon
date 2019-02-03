@@ -9,7 +9,7 @@ def run_all():
     filename = "CAN_Test_DATA.csv"
 
     # , nrows=10000
-    machine_data = pd.read_csv(filename, encoding='mac_roman')
+    machine_data = pd.read_csv(filename, encoding='mac_roman', nrows=10000)
 
     machine_data = machine_data.drop(columns='Unnamed: 0')
     # print(machine_data.head())

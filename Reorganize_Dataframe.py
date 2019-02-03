@@ -45,6 +45,10 @@ def generate_processes(num_processes, param_name_to_param_value_map, reordered, 
 			try:
 				# pops a row off of the list of rows for current param, gets the can_value for that row (corresponds to 6th index)
 				current_process[param] = param_name_to_param_value_map[param].pop()
+				if param == throwout_row:
+					if current_process[param] < 0.001:
+						skip_process = True
+						break
 			except:
 				# will go here if param_name_to_param_value_map[param] does not have any members left 
 				if throwout_row:
