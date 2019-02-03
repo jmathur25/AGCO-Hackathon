@@ -95,6 +95,7 @@ rf = RandomForestRegressor(n_jobs=-1, bootstrap=True, n_estimators=40, min_sampl
 
 # runs everything in Read_CSV
 machine_data = run_all()
+
 # splitting via the 80/20 rule
 train_data, validate_data = split_train_validate(machine_data, 0.8)
 
@@ -149,7 +150,20 @@ def rf_feature_importance(rf, df):
 features = rf_feature_importance(rf, train_data_params)
 # to see the 10 most important features
 print(features[:30])
-#
+
+plt.barh(features['cols'][:30], features['importance'][:30])
+plt.show()
+
+
+TRANS_OIL_TEMP = []
+GRAIN_LOSS_Rotor = []
+for index, row in machine_data.iterrows():
+    TRANS_OIL_TEMP.append(row['TRANS_OIL_TEMP'])
+    GRAIN_LOSS_Rotor.append(row['GRAIN_LOSS_Rotor'])
+
+plt.barh(TRANS_OIL_TEMP, GRAIN_LOSS_Rotor)
+plt.show()
+
 def plot_features(features):
     features.plot('cols', 'importance', 'barh', figsize=(12,7), legend=False)
 plot_features(features)
